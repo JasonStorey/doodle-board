@@ -35,15 +35,17 @@ module.exports = {
             var offset = $(canvas).offset();
             var x1 = Math.floor((event.pageX - offset.left) / pixSize - 1),
                 y1 = Math.floor((event.pageY - offset.top) / pixSize - 1);
-            var x0 = (lastPoint == null) ? x1 : lastPoint[0];
-            var y0 = (lastPoint == null) ? y1 : lastPoint[1];
-            var dx = Math.abs(x1 - x0), dy = Math.abs(y1 - y0);
-            var sx = (x0 < x1) ? 1 : -1, sy = (y0 < y1) ? 1 : -1, err = dx - dy;
+            var x0 = (lastPoint === null) ? x1 : lastPoint[0];
+            var y0 = (lastPoint === null) ? y1 : lastPoint[1];
+            var dx = Math.abs(x1 - x0),
+                dy = Math.abs(y1 - y0);
+            var sx = (x0 < x1) ? 1 : -1,
+                sy = (y0 < y1) ? 1 : -1,
+                err = dx - dy;
             while (true) {
-                //write the pixel into Firebase, or if we are drawing white, remove the pixel
                 pixelDataRef.child(x0 + ":" + y0).set(currentColor === "fff" ? null : currentColor);
 
-                if (x0 == x1 && y0 == y1) break;
+                if (x0 === x1 && y0 === y1) break;
                 var e2 = 2 * err;
                 if (e2 > -dy) {
                     err = err - dy;
@@ -64,10 +66,12 @@ module.exports = {
             context.fillStyle = "#" + snapshot.val();
             context.fillRect(parseInt(coords[0]) * pixSize, parseInt(coords[1]) * pixSize, pixSize, pixSize);
         }
+
         function clearPixel(snapshot) {
             var coords = snapshot.key().split(":");
             context.clearRect(parseInt(coords[0]) * pixSize, parseInt(coords[1]) * pixSize, pixSize, pixSize);
         }
+
         pixelDataRef.on('child_added', drawPixel);
         pixelDataRef.on('child_changed', drawPixel);
         pixelDataRef.on('child_removed', clearPixel);
